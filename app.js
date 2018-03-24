@@ -10,6 +10,18 @@ function hasData() {
 
 function clearData() {localStorage.clear();}
 
+function initKanaData() {
+  //TODO Initialize Kana Data Structure in Local Storage
+}
+
+function kanaCorrect(kana) {
+  //TODO Update kana based on correct answer
+}
+
+function kanaIncorrect(kana) {
+  //TODO Update kana based on incorrect answer (reset time)
+}
+
 function showIntro(){
   return botui.message.add({
     content: "Hello! I'm " + botname + ". I'm glad you chose this resource to \
@@ -67,6 +79,18 @@ function getUser() {
     });
 }
 
+function checkReviews(){
+  //TODO Check for and inform user of upcoming reviews
+}
+
+function startLessons(group){
+  //TODO Start lessons starting at specific group
+}
+
+function startReviews(){
+  //TODO Start reviewing available reviews
+}
+
 function init(){
   if (hasData()){
     user = JSON.parse(localStorage.getItem('user')).value;
@@ -77,6 +101,7 @@ function init(){
 
 function main(){
   return botui.action.text({
+    delay: 1000,
     action: {placeholder: "Enter a Command... (Type Help if You're Stuck)"}
     }).then(function (res) {
       //TODO Handle Commands Here
