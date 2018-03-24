@@ -2,7 +2,7 @@
     box-sizing: border-box;
 }
 .row {
-  height: 100vh;
+  height: 80vh;
   padding-left: 0px;
   padding-right: 0px;
 }
@@ -10,13 +10,40 @@
 .column {
     float: left;
     width: 33.33%;
-    padding: 10px;
-    height: 80%; 
+    padding: 35px;
+    height: 80%;
+    border-radius: 25px;
 }
+
+.column2 {
+    float: left;
+    width: 33.33%;
+    padding: 10px;
+    height: 80%;
+    border-radius: 25px;
+}
+
 
 /* Clear floats after the columns */
 .row:after {
     content: "";
     display: table;
     clear: both;
+}
+
+.headerrow {
+  height: 10vh;
+
+}
+
+.fix{
+    position:fixed;
+    bottom:0px;
+    right: 0px;
+    }
+
+.fix2{
+  position:fixed;
+  top:20px;
+  left:30px;
 }
