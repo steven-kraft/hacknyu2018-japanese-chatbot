@@ -1,16 +1,12 @@
-import BotUI from 'botui'
-import Vue from 'vue'
-
-// window.Vue = Vue; // use either this
-var botui = new BotUI('hello-world', {
+var botui = new BotUI('japan-bot', {
   vue: Vue // or this
 });
 
 botui.message.add({
-  content: 'Hello World from bot!'
+  content: 'Hello! Are you ready to learn Japanese?! 😤'
 });
 
 botui.message.add({
   human: true,
-  content: 'Hello World from human!'
+  content: 'Howdy!'
 });
