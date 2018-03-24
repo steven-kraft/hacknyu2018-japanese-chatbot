@@ -2,6 +2,8 @@ var botui = new BotUI('japan-bot', {
   vue: Vue // or this
 });
 
+var botname = "JapanBot";
+
 function hasData() {
   return localStorage.getItem('user');
 }
@@ -9,8 +11,37 @@ function hasData() {
 function clearData() {localStorage.clear();}
 
 function showIntro(){
+  botui.message.add({
+    content: `Hello! I'm ${botname}. I'm glad you chose this resource to help you learn to read Japanese.`
+  }).then(function () {
+      botui.message.add({
+        content: 'Are you familiar with hiragana and katakana?',
+        delay: 1000
+      })
+    }).then(function(){
+      return botui.action.button({
+        delay: 1000,
+        action: [{text: 'Yes', value: true}, {text: 'No', value: false}]
+      })
+    }).then(function (res) {
+        if(!res.value) {
+          botui.message.add({
+            delay: 1000,
+            content: "Hiragana and katakana, collectively called kana, are two of the three writing systems used in Japanese."
+          }).then(function(){
+            botui.message.add({
+              delay: 1000,
+              content: "Hiragana and katakana are syllabaries which represent all of the possible sounds that can be expressed in the Japanese language."
+            }).then(function(){
+                botui.message.add({
+                  delay: 1000,
+                  content: " There are 46 of each; each hiragana has a corresponding katakana, and they sound the same. Hiragana is used to write native Japanese words, and katakana is used to write foreign loanwords."
+                  })
+              })
+          })
 
-  //TODO Explain how the chat bot works
+        }
+      });
 }
 
 function getUser() {
@@ -21,7 +52,7 @@ function getUser() {
   } else {
     return botui.message.add({
       human: true,
-      content: 'Whats your name?'
+      content: "Great! One more thing, what's your name?"
     }).then(function () {
       return botui.action.text({
         action: {
@@ -36,6 +67,7 @@ function getUser() {
 }
 
 var user = "";
+showIntro();
 getUser().then(function(){
   botui.message.add({content: 'Hello ' + user + '!'});
 });
