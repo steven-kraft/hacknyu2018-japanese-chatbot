@@ -14,7 +14,7 @@ function showIntro(){
   return botui.message.add({
     content: `Hello! I'm ${botname}. I'm glad you chose this resource to help you learn to read Japanese.`
   }).then(function () {
-      botui.message.add({
+      return botui.message.add({
         content: 'Are you familiar with hiragana and katakana?',
         delay: 1000
       })
@@ -35,7 +35,7 @@ function showIntro(){
             }).then(function(){
                 return botui.message.add({
                   delay: 3000,
-                  content: " There are 46 of each; each hiragana has a corresponding katakana, and they sound the same. Hiragana is used to write native Japanese words, and katakana is used to write foreign loanwords."
+                  content: "There are 46 of each; each hiragana has a corresponding katakana, and they sound the same. Hiragana is used to write native Japanese words, and katakana is used to write foreign loanwords."
                   })
               })
           })
