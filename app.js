@@ -4,14 +4,6 @@ var botui = new BotUI('japan-bot', {
 
 var botname = "JapanBot";
 
-var hiragana = [
-		"あ","い","う","え","お","か","き","く","け","こ","さ","し","す","せ","そ",
-    "た","ち","つ","て","と","な","に","ぬ","ね","の","は","ひ","ふ","へ","ほ",
-    "ま","み","む","め","も","や","ゆ","よ","ら","り","る","れ","ろ","わ","を",
-    "ん","が","ぎ","ぐ","げ","ご","ざ","じ","ず","ぜ","ぞ","だ","ぢ","づ","で",
-    "ど","ば","び","ぶ","べ","ぼ","ぱ","ぴ","ぷ","ぺ","ぽ"
-]
-
 var kanaData = [];
 
 function hasData() {
@@ -22,9 +14,9 @@ function clearData() {localStorage.clear();}
 
 function initKanaData() {
   //TODO Initialize Kana Data Structure in Local Storage
-  hiragana.forEach(function(h){
+  kana.forEach(function(k){
       kanaData.push({
-          kana: h,
+          kana: k,
           level: 0,
           next_review: null
         })
@@ -93,13 +85,16 @@ function getUser() {
         action: {placeholder: 'Your name'}
       }).then(function (res) {
         localStorage.setItem('user', JSON.stringify(res));
-        initKanaData();
         user = res.value;
     });
 }
 
 function checkReviews(){
   //TODO Check for and inform user of upcoming reviews
+}
+
+function lessonIntro(){
+  //TODO Introduce User to Lesson System if they are new
 }
 
 function startLessons(group){
@@ -115,7 +110,13 @@ function init(){
     user = JSON.parse(localStorage.getItem('user')).value;
     return botui.action.hide({});
   }
-  else {return showIntro();}
+  else {
+    return showIntro().then(function(){
+      initKanaData();
+      localStorage.setItem('newUser', true);
+      localStorage.setItem('group', 0);
+    });
+  }
 }
 
 function main(){
