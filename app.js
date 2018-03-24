@@ -60,9 +60,7 @@ function showIntro(){
 function getUser() {
   // Get Name from User and store in LocalStorage
   return botui.action.text({
-        action: {
-          placeholder: 'Your name'
-        }
+        action: {placeholder: 'Your name'}
       }).then(function (res) {
         localStorage.setItem('user', JSON.stringify(res));
         user = res.value;
@@ -77,10 +75,20 @@ function init(){
   else {return showIntro();}
 }
 
+function main(){
+  return botui.action.text({
+    action: {placeholder: "Enter a Command... (Type Help if You're Stuck)"}
+    }).then(function (res) {
+      //TODO Handle Commands Here
+      console.log("User Entered: ", res.value);
+      return botui.action.hide({});
+    }).then(function(){return main();})
+}
+
 var user = "";
 init().then(function(){
-  botui.message.add({
+  return botui.message.add({
     content: 'Hello ' + user + '!',
     delay: 1000
   });
-});
+}).then(function(){return main();});
