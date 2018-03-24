@@ -52,28 +52,35 @@ function showIntro(){
             delay: 1000,
             content: "Great! One more thing, what's your name?"
           })
+        }).then(function() {
+          return getUser();
         });
 }
 
 function getUser() {
   // Get Name from User and store in LocalStorage
-  return showIntro().then(function(){
-      return botui.action.text({
-          action: {
-            placeholder: 'Your name'
-          }
-        }).then(function (res) {
-          localStorage.setItem('user', JSON.stringify(res));
-          user = res.value;
-      });
+  return botui.action.text({
+        action: {
+          placeholder: 'Your name'
+        }
+      }).then(function (res) {
+        localStorage.setItem('user', JSON.stringify(res));
+        user = res.value;
     });
 }
 
-var user = "";
-if (hasData()){user = JSON.parse(localStorage.getItem('user')).value;}
-else {showIntro();}
+function init(){
+  if (hasData()){
+    user = JSON.parse(localStorage.getItem('user')).value;
+    return botui.action.hide({});
+  }
+  else {return showIntro();}
+}
 
-botui.message.add({
-  content: 'Hello ' + user + '!',
-  delay: 1000
+var user = "";
+init().then(function(){
+  botui.message.add({
+    content: 'Hello ' + user + '!',
+    delay: 1000
+  });
 });
