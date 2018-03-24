@@ -4,6 +4,8 @@ var botui = new BotUI('japan-bot', {
 
 var botname = "JapanBot";
 
+var kanaData = [];
+
 function hasData() {
   return localStorage.getItem('user');
 }
@@ -12,6 +14,14 @@ function clearData() {localStorage.clear();}
 
 function initKanaData() {
   //TODO Initialize Kana Data Structure in Local Storage
+  kana.forEach(function(k){
+      kanaData.push({
+          kana: k,
+          level: 0,
+          next_review: null
+        })
+  })
+  localStorage.setItem('kanaData', JSON.stringify(kanaData));
 }
 
 function kanaCorrect(kana) {
@@ -83,6 +93,10 @@ function checkReviews(){
   //TODO Check for and inform user of upcoming reviews
 }
 
+function lessonIntro(){
+  //TODO Introduce User to Lesson System if they are new
+}
+
 function startLessons(group){
   //TODO Start lessons starting at specific group
 }
@@ -96,7 +110,13 @@ function init(){
     user = JSON.parse(localStorage.getItem('user')).value;
     return botui.action.hide({});
   }
-  else {return showIntro();}
+  else {
+    return showIntro().then(function(){
+      initKanaData();
+      localStorage.setItem('newUser', true);
+      localStorage.setItem('group', 0);
+    });
+  }
 }
 
 function main(){
