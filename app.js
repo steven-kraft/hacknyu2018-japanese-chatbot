@@ -9,15 +9,17 @@ function hasData() {
 function clearData() {localStorage.clear();}
 
 function showIntro(){
-  //TODO Introduce user to the chatbot
+
+  //TODO Explain how the chat bot works
 }
 
 function getUser() {
   // Get Name from User and store in LocalStorage
   if (hasData()){
-    return JSON.parse(localStorage.getItem('user')).value;
+    user = JSON.parse(localStorage.getItem('user')).value;
+    return botui.action.hide({});
   } else {
-    botui.message.add({
+    return botui.message.add({
       human: true,
       content: 'Whats your name?'
     }).then(function () {
@@ -28,10 +30,12 @@ function getUser() {
       });
     }).then(function (res) {
       localStorage.setItem('user', JSON.stringify(res));
-      return res.value;
+      user = res.value;
     });
   }
 }
 
-var user = getUser();
-botui.message.add({content: 'Hello ' + user + '!'});
+var user = "";
+getUser().then(function(){
+  botui.message.add({content: 'Hello ' + user + '!'});
+});
