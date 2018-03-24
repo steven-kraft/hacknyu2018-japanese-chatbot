@@ -1,0 +1,22 @@
+* {
+    box-sizing: border-box;
+}
+.row {
+  height: 100vh;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+/* Create three equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 33.33%;
+    padding: 10px;
+    height: 80%; 
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}

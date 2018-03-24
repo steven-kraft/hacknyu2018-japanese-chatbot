@@ -6,12 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/botui/build/botui.min.css" />
     <link rel="stylesheet" href="css/botui.css" />
+    <link rel="stylesheet" href="css/main.css" />
     <meta name="description" content="A Chat Bot to Help you learn Japanese.">
   </head>
   <body>
-    <div class="botui-app-container" id="japan-bot">
-      <bot-ui></bot-ui>
+    <h2>JapanBot!</h2>
+
+    <div class="row">
+      <div class="column" style="background-color:#A1C5CB;">
+        <h2>Navigation</h2>
+        <p>Links and stuff</p>
+      </div>
+      <div class="column" style="background-color:#3c7f89;">
+        <h2>Chat window</h2>
+        <div class="botui-app-container" id="japan-bot">
+          <bot-ui></bot-ui>
+        </div>
+      </div>
+      <div class="column" style="background-color:#A1C5CB;">
+        <h2>Fancy graphics</h2>
+        <p>Some pics</p>
+      </div>
     </div>
+
+
     <script src="https://cdn.jsdelivr.net/vue/2.0.5/vue.min.js"></script>
     <script src="https://unpkg.com/botui/build/botui.js"></script>
     <script src="./app.js"></script>
