@@ -307,7 +307,7 @@ function main(){
   }
   return botui.action.text({
     delay: delay_time,
-    action: {placeholder: "Enter a Command..."}
+    action: {placeholder: "Enter a Command... (Type Help if You're Stuck)"}
     }).then(function (res) {
       //TODO Handle Commands Here
       if(res.value == "help" || res.value == "Help"){
