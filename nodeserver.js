@@ -10,20 +10,26 @@ var server =http.createServer(function(request, response){
     if(path=="/findword"){
         console.log("request recieved");
         var request = require("request");
+        console.log(variablename)
         request(`http://jisho.org/api/v1/search/words?keyword=${variablename}`,function(error,response2,body)
       	{
-          console.log(variablename)
           var obj = JSON.parse(body)
-          var englishtrans = obj.data[0].senses[0].english_definitions
-          var engstring = englishtrans.join()
+          try{
+            var jWord0 = obj.data[0].japanese[0].word
+            var jRead0= obj.data[0].japanese[0].reading
+            var eTrans0 = obj.data[0].senses[0].english_definitions
 
-          response.writeHead(200, {"Content-Type": "text/plain", "Access-Control-Allow-Origin":"*"});
-          response.end(engstring);
-          console.log("string sent");
+            var result = {jword : jWord0, jRead : jRead0, eTrans : eTrans0.join()};
+            response.writeHead(200, {"Content-Type": "text/plain", "Access-Control-Allow-Origin":"*"});
+            console.log(result)
+            response.end(JSON.stringify(result));
+            console.log("string sent");
+          }
+          catch(e){}
       	})
 
     }else{
-        console.log("shit")
+        console.log("error")
     }
 }).listen(8001);
 console.log("server initialized");
