@@ -10,18 +10,12 @@
 .column {
     float: left;
     width: 33.33%;
-    padding: 35px;
+    padding: 0px;
     height: 80%;
     border-radius: 25px;
 }
 
-.column2 {
-    float: left;
-    width: 33.33%;
-    padding: 10px;
-    height: 80%;
-    border-radius: 25px;
-}
+
 
 
 /* Clear floats after the columns */
@@ -44,6 +38,20 @@
 
 .fix2{
   position:fixed;
-  top:20px;
-  left:30px;
+  top:40px;
+  left:60px;
+}
+
+.text-effects{
+  font-size:50px;
+  font-family:Arial Black, Arial Bold, Gadget, sans-serif;
+  text-shadow:2px 2px 3px #000;
+  -webkit-text-stroke: 2px #000;
+  color: white;
+
+
+}
+
+.kana{
+  font-size: 150%;
 }
