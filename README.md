@@ -15,15 +15,11 @@ JapanBot exists to provide a simple and user-friendly method of learning the kan
 
 ### Screenshots
 
-**Screenshot**
+![](./img/screenshot.jpg)
 
 ### Built With:
 
-Built with BotUI and NodeJS.
-
-### Usage
-
-Using JapanBot is as simple as entering the website and typing. Users can respond to various prompts meant to stimulate a learning experience, and can also ask JapanBot questions at any time.
+BotUI and NodeJS.
 
 ### Credits
 
