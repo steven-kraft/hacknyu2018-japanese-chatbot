@@ -1,15 +1,23 @@
 var dict = {}
-function translate(variable){ //Goes to the node.js server
-   xmlhttp = new XMLHttpRequest();
-   xmlhttp.open("GET",`http://localhost:8001/findword?content=${variable}`, true);
-   xmlhttp.onreadystatechange=function(){
+function translate(variable, callback){ //Goes to the node.js server
+    var string = ''
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET",`http://localhost:8001/findword?content=${variable}`, true);
+    xmlhttp.onreadystatechange=function(){
          if (xmlhttp.readyState==4 && xmlhttp.status==200){
-           string=xmlhttp.responseText;
-           console.log(string);
-         }
-   }
-   xmlhttp.send("");
+           callback(xmlhttp.responseText)
+        }
+    }
+  xmlhttp.send("");
+  }
+function mycallback(data){
+  var obj = JSON.parse(data);
+  return botui.message.add({
+    content: "word: " + obj.jword + '   Reading: ' + obj.jRead + '  English: ' + obj.eTrans
+  })
 }
+
+
 function b(){console.log("yo this works")}
 function c(){console.log("yo this works")}
 
