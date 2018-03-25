@@ -4,7 +4,11 @@ var botui = new BotUI('japan-bot', {
 
 var botname = "JapanBot";
 
-var kanaData = [];
+var kanaData = {};
+if(localStorage.getItem('kanaData')){
+  kanaData = JSON.parse(localStorage.getItem('kanaData'));
+}
+
 var reviews = [];
 var lessons = [];
 var newUser = localStorage.getItem('newUser');
@@ -21,11 +25,7 @@ function clearData() {localStorage.clear();}
 function initKanaData() {
   //Initialize Kana Data Structure in Local Storage
   kana.forEach(function(k){
-      kanaData.push({
-          kana: k,
-          level: 0,
-          next_review: null
-        })
+      kanaData[k] = {level: 0, next_review: null}
   })
   localStorage.setItem('kanaData', JSON.stringify(kanaData));
 }
@@ -102,8 +102,8 @@ function incrementGroup(){
 
 function checkLessons(){
   var lastLesson = localStorage.getItem('lastLesson');
-  if(newUser || !lastLesson){return true;}
-  if(new Date().getHours() - lastLesson.getHours() > 0) {return true;}
+  if(newUser == "true" || !lastLesson){return true;}
+  if(new Date().getHours() - new Date(lastLesson).getHours() > 0) {return true;}
   else {return false;}
 }
 
@@ -174,8 +174,11 @@ function displayLessons(){
       action: [{text: button_text, value: true}]
     })
   }).then(function(res){
+    kanaData[lessons[0]].level = 1;
     if(res.text == "Done") {
       incrementGroup();
+      localStorage.setItem('kanaData', JSON.stringify(kanaData));
+      localStorage.setItem('newUser', false);
     }
     lessons.shift();
     return displayLessons();
@@ -234,7 +237,7 @@ init().then(function(){
   });
 }).then(function(){
   if(checkLessons()){
-    if(localStorage.getItem('group')){return lessonIntro();}
+    if(localStorage.getItem('group') == 0){return lessonIntro();}
     else {return startLessons();}
   }
   else{return main();}
