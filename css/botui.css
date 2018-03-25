@@ -5,6 +5,12 @@
     font-family: "Open Sans", sans-serif
 }
 
+.botui-app-container {
+    width: auto;
+    height: 100%;
+    margin: 0 auto;
+}
+
 .botui-messages-container {
     padding: 10px 20px
 }

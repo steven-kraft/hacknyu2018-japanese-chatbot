@@ -13,8 +13,12 @@ var reviews = [];
 var lessons = [];
 var newUser = localStorage.getItem('newUser');
 var group = localStorage.getItem('group');
+var skip = false;
 
-var times = [4,8,24,48,168,336,728,2912]; // in hours
+var correct = 0;
+var incorrect = 0;
+
+var times = [0,4,8,24,48,168,336,728,2912]; // in hours
 
 function hasData() {
   return localStorage.getItem('user');
@@ -30,12 +34,39 @@ function initKanaData() {
   localStorage.setItem('kanaData', JSON.stringify(kanaData));
 }
 
-function kanaCorrect(kana) {
-  //TODO Update kana based on correct answer
+function kanaCorrect(cur_kana) {
+  kanaData[cur_kana].level += 1;
+  correct += 1;
+  var h = times [kanaData[cur_kana].level - 1]
+  var time = new Date()
+  time.setHours(time.getHours() + h)
+  kanaData[cur_kana].next_review = time;
+  localStorage.setItem('kanaData', JSON.stringify(kanaData));
+  return botui.message.add({
+    delay: 500,
+    content: "Correct!!!"
+  });
 }
 
-function kanaIncorrect(kana) {
-  //TODO Update kana based on incorrect answer (reset time)
+function kanaIncorrect(cur_kana) {
+  kanaData[cur_kana].level = 2;
+  incorrect += 1;
+  var h = times [kanaData[cur_kana].level - 1]
+  var time = new Date()
+  time.setHours(time.getHours() + h)
+  kanaData[cur_kana].next_review = time;
+  localStorage.setItem('kanaData', JSON.stringify(kanaData));
+  return botui.message.add({
+    delay: 500,
+    content: "Wrong!!!"
+  });
+}
+
+function reviewResults(){
+  return botui.message.add({
+    delay: 1000,
+    content: "Review Complete! You got " + correct + " correct and " + incorrect + " wrong."
+  }).then(function(){return main();});
 }
 
 function showIntro(){
@@ -103,16 +134,19 @@ function incrementGroup(){
 function checkLessons(){
   var lastLesson = localStorage.getItem('lastLesson');
   if(newUser == "true" || !lastLesson){return true;}
+  if(checkReviews() > 0) {return false;}
   if(new Date().getHours() - new Date(lastLesson).getHours() > 0) {return true;}
   else {return false;}
 }
 
 function checkReviews(){
-  var kanaData = localStorage.getItem('kanaData');
+  var kanaData = JSON.parse(localStorage.getItem('kanaData'));
   reviews = [];
-  kanaData.forEach(function(k){
-      if (k.next_review.getHours() < Date().getHours()){
-        reviews.push(k.kana);
+  Object.keys(kanaData).forEach(function(k) {
+      if (kanaData[k].next_review != null) {
+        if (new Date(kanaData[k].next_review) < new Date()){
+          reviews.push(k);
+        }
       }
   })
   return reviews.length;
@@ -142,15 +176,28 @@ function lessonIntro(){
   }).then(function(){return startLessons()})
 }
 
+var tempLessons;
+
 function startLessons(){
-  //TODO Start lessons starting at specific group
-  lessons = kanaGroups[group];
+  lessons = kanaGroups[group].slice();
+  tempLessons = lessons.slice();
   return botui.message.add({
     delay: 1000,
     content: "Now, we'll begin by learning " + lessons.join(", ")
   }).then(function(){
-    localStorage.setItem('lastLesson', new Date());
+    return botui.message.add({
+      delay: 1000,
+      content: "Are you ready?"
+    });
+  }).then(function(){
+    return botui.action.button({
+      delay: 1000,
+      action: [{text: 'Yes', value: true}, {text: 'No', value: false}]
+    })
+  }).then(function(res){
     localStorage.setItem('newUser', false);
+    if(!res.value) {skip = true; return main();}
+    localStorage.setItem('lastLesson', new Date());
     return displayLessons();
   });
 }
@@ -167,18 +214,21 @@ function displayLessons(){
       content: "This hiragana is " + lessons[0] + ", which can be written '" + wanakana.toRomaji(lessons[0]) + "'."
     });
   }).then(function(){
-    button_text = "Next"
+    var button_text = "Next"
     if (lessons.length == 1) {button_text = "Done"}
     return botui.action.button({
       delay: 1000,
       action: [{text: button_text, value: true}]
-    })
+    });
   }).then(function(res){
-    kanaData[lessons[0]].level = 1;
-    if(res.text == "Done") {
+        if(res.text == "Done") {
       incrementGroup();
+            localStorage.setItem('newUser', false);
+      tempLessons.forEach(function(k){
+          kanaData[k].next_review = new Date();
+          kanaData[k].level = 1;
+      })
       localStorage.setItem('kanaData', JSON.stringify(kanaData));
-      localStorage.setItem('newUser', false);
     }
     lessons.shift();
     return displayLessons();
@@ -186,7 +236,45 @@ function displayLessons(){
 }
 
 function startReviews(){
-  //TODO Start reviewing available reviews
+  correct = 0;
+  incorrect = 0;
+  return botui.message.add({
+    delay: 1000,
+    content: "Let's review what you've learned!"
+  }).then(function(){
+    return botui.message.add({
+      delay: 1000,
+      content: "You have " + checkReviews() + " reviews! Are you ready?"
+    });
+  }).then(function(){
+    return botui.action.button({
+      delay: 1000,
+      action: [{text: 'Yes', value: true}, {text: 'No', value: false}]
+    })
+  }).then(function(res){
+    if(!res.value){skip = true; return main();}
+    return displayReviews();
+  });
+}
+
+function displayReviews(){
+  if (reviews.length == 0) {return reviewResults();}
+  var current = reviews[Math.floor(Math.random()*reviews.length)];
+  return botui.message.add({
+    delay: 1000,
+    cssClass: 'kana',
+    content: current
+  }).then(function(){
+    return botui.action.text({
+      delay: 1000,
+      action: {placeholder: 'Reading?'}
+    });
+  }).then(function(res){
+      if(res.value.toLowerCase().trim() == wanakana.toRomaji(current)) {
+        reviews = reviews.filter(c => c !== current);
+        return kanaCorrect(current);
+      } else {return kanaIncorrect(current);}
+  }).then(function(){return displayReviews()})
 }
 
 function init(){
@@ -206,6 +294,10 @@ function init(){
 }
 
 function main(){
+  if(!skip){
+    if (checkReviews() > 0) {return startReviews();}
+    else if(checkLessons) {return startLessons();}
+  }
   return botui.action.text({
     delay: 1000,
     action: {placeholder: "Enter a Command... (Type Help if You're Stuck)"}
@@ -244,8 +336,7 @@ init().then(function(){
   });
 }).then(function(){
   if(checkLessons()){
-    if(localStorage.getItem('group') == 0){return lessonIntro();}
-    else {return startLessons();}
+    if(parseInt(localStorage.getItem('group')) == 0){return lessonIntro();}
   }
   else{return main();}
 });
