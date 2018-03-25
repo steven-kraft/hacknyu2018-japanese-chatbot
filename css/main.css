@@ -56,7 +56,7 @@
 .fix3{
   position:fixed;
   top:294px;
-  left:140px;
+  left:120px;
 }
 
 .text-effects{
@@ -84,6 +84,21 @@
 
 }
 
+a:link{
+  color:white;
+  text-decoration:none;
+  background-color:#3c7f89;
+  font-size: 25px;
+  border-radius: 5px;
+  }
+a:visited{
+  color:white;
+  text-decoration:none;
+  background-color:#3c7f89;
+  font-size: 25px;
+  border-radius: 5px;
+}
+
 @media (max-height:822px){
   .about-text{
     font-size:10;
@@ -104,6 +119,12 @@
     position:fixed;
     top:75px;
     left:20px;
+  }
+  a:link{
+    font-size: 10px;
+  }
+  a:visited{
+    font-size: 10px;
   }
   .fix2{
     width:50px;
