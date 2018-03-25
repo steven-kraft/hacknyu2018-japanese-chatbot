@@ -208,6 +208,19 @@ function main(){
     action: {placeholder: "Enter a Command... (Type Help if You're Stuck)"}
     }).then(function (res) {
       //TODO Handle Commands Here
+      for(var key in dict) {
+          var regex = new RegExp(key, "gi"); //turns back to regex
+          var tested = regex.test(res.value)
+          if(tested){ //matched a regex
+            if(dict[key] == translate){// goes into translate(eng or Jap)
+              var tester = res.value.match(/([\u3040-\u30FF]+)/gi);
+              console.log(res.value)
+              console.log(tester)
+              console.log(tester[0])
+              translate(tester[0])
+            }
+          }
+        }
       console.log("User Entered: ", res.value);
       return botui.action.hide({});
     }).then(function(){return main();})
