@@ -301,7 +301,7 @@ function main(){
   }
   return botui.action.text({
     delay: delay_time,
-    action: {placeholder: "Enter a Command... (Type Help if You're Stuck)"}
+    action: {placeholder: "Enter a Command..."}
     }).then(function (res) {
       //TODO Handle Commands Here
       for(var key in dict) {
