@@ -10,6 +10,7 @@ var server =http.createServer(function(request, response){
     if(path=="/findword"){
         console.log("request recieved");
         var request = require("request");
+        console.log(variablename)
         request(`http://jisho.org/api/v1/search/words?keyword=${variablename}`,function(error,response2,body)
       	{
           var obj = JSON.parse(body)

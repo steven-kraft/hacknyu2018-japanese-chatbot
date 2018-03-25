@@ -4,6 +4,18 @@ var botui = new BotUI('japan-bot', {
 
 var botname = "JapanBot";
 
+var kanaData = {};
+if(localStorage.getItem('kanaData')){
+  kanaData = JSON.parse(localStorage.getItem('kanaData'));
+}
+
+var reviews = [];
+var lessons = [];
+var newUser = localStorage.getItem('newUser');
+var group = localStorage.getItem('group');
+
+var times = [4,8,24,48,168,336,728,2912]; // in hours
+
 function hasData() {
   return localStorage.getItem('user');
 }
@@ -11,7 +23,11 @@ function hasData() {
 function clearData() {localStorage.clear();}
 
 function initKanaData() {
-  //TODO Initialize Kana Data Structure in Local Storage
+  //Initialize Kana Data Structure in Local Storage
+  kana.forEach(function(k){
+      kanaData[k] = {level: 0, next_review: null}
+  })
+  localStorage.setItem('kanaData', JSON.stringify(kanaData));
 }
 
 function kanaCorrect(kana) {
@@ -79,12 +95,94 @@ function getUser() {
     });
 }
 
-function checkReviews(){
-  //TODO Check for and inform user of upcoming reviews
+function incrementGroup(){
+  group = parseInt(localStorage.getItem('group')) + 1;
+  localStorage.setItem('group', group);
 }
 
-function startLessons(group){
+function checkLessons(){
+  var lastLesson = localStorage.getItem('lastLesson');
+  if(newUser == "true" || !lastLesson){return true;}
+  if(new Date().getHours() - new Date(lastLesson).getHours() > 0) {return true;}
+  else {return false;}
+}
+
+function checkReviews(){
+  var kanaData = localStorage.getItem('kanaData');
+  reviews = [];
+  kanaData.forEach(function(k){
+      if (k.next_review.getHours() < Date().getHours()){
+        reviews.push(k.kana);
+      }
+  })
+  return reviews.length;
+}
+
+function lessonIntro(){
+  return botui.message.add({
+    delay: 1000,
+    content: "Let's learn hiragana!"
+  }).then(function(){
+    return botui.message.add({
+      delay: 1000,
+      content: "During these lessons, you will be first shown a Hiragana \
+      character and how it is written."
+    })
+  }).then(function(){
+      return botui.message.add({
+        delay: 1000,
+        content: "You can listen to how it's pronounced, too."
+      })
+  }).then(function(){
+      return botui.message.add({
+        delay: 1000,
+        content: "After you've learned a few kana, you'll be given the \
+        opportunity to review everything."
+      })
+  }).then(function(){return startLessons()})
+}
+
+function startLessons(){
   //TODO Start lessons starting at specific group
+  lessons = kanaGroups[group];
+  return botui.message.add({
+    delay: 1000,
+    content: "Now, we'll begin by learning " + lessons.join(", ")
+  }).then(function(){
+    localStorage.setItem('lastLesson', new Date());
+    localStorage.setItem('newUser', false);
+    return displayLessons();
+  });
+}
+
+function displayLessons(){
+  if (lessons.length == 0) {return botui.action.hide({});}
+  return botui.message.add({
+    delay: 1000,
+    cssClass: 'kana',
+    content: lessons[0]
+  }).then(function(){
+    return botui.message.add({
+      delay: 1500,
+      content: "This hiragana is " + lessons[0] + ", which can be written '" + wanakana.toRomaji(lessons[0]) + "'."
+    });
+  }).then(function(){
+    button_text = "Next"
+    if (lessons.length == 1) {button_text = "Done"}
+    return botui.action.button({
+      delay: 1000,
+      action: [{text: button_text, value: true}]
+    })
+  }).then(function(res){
+    kanaData[lessons[0]].level = 1;
+    if(res.text == "Done") {
+      incrementGroup();
+      localStorage.setItem('kanaData', JSON.stringify(kanaData));
+      localStorage.setItem('newUser', false);
+    }
+    lessons.shift();
+    return displayLessons();
+  });
 }
 
 function startReviews(){
@@ -96,7 +194,15 @@ function init(){
     user = JSON.parse(localStorage.getItem('user')).value;
     return botui.action.hide({});
   }
-  else {return showIntro();}
+  else {
+    return showIntro().then(function(){
+      initKanaData();
+      localStorage.setItem('newUser', true);
+      newUser = true;
+      localStorage.setItem('group', 0);
+      group = 0;
+    });
+  }
 }
 
 function main(){
@@ -110,12 +216,14 @@ function main(){
           var tested = regex.test(res.value)
           if(tested){ //matched a regex
             if(dict[key] == translate){// goes into translate(eng or Jap)
+              var tester = res.value.match(/([\u3040-\u30FF]+)/gi)
               if (tester == null){
                 tester = res.value.match(/([a-z]+)/gi);
+                console.log(tester[1])
                 translate(tester[1], mycallback)
               }
               else{
-                var tester = res.value.match(/([\u3040-\u30FF]+)/gi);
+                console.log('jAP');
                 translate(tester[0], mycallback)
               }
             }
@@ -127,10 +235,17 @@ function main(){
     }).then(function(){return main();})
 }
 
+
 var user = "";
 init().then(function(){
   return botui.message.add({
     content: 'Hello ' + user + '!',
     delay: 1000
   });
-}).then(function(){return main();});
+}).then(function(){
+  if(checkLessons()){
+    if(localStorage.getItem('group') == 0){return lessonIntro();}
+    else {return startLessons();}
+  }
+  else{return main();}
+});
