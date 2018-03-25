@@ -56,7 +56,16 @@
   font-size: 250%;
 }
 
-@media (max-width:720px) {
+
+
+@media (max-width:1678px){
+  .fix{
+    width:300px;
+    height:279px;
+  }
+}
+
+@media (max-width:995px) {
   .fix2{
     width:50px;
     height:50px;
@@ -65,7 +74,8 @@
     left:18px;
   }
   .fix{
-    display:none;
+    width:100px;
+    height:93px;
 
   }
 }
