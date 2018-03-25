@@ -292,6 +292,12 @@ function init(){
     });
   }
 }
+function help(){
+  botui.message.add({
+  delay: 1000,
+  content: "Enter: \'translate word\' to begin! \(The word can be English or Japanese\)"
+  });
+}
 
 function main(){
   if(!skip){
@@ -303,25 +309,30 @@ function main(){
     action: {placeholder: "Enter a Command... (Type Help if You're Stuck)"}
     }).then(function (res) {
       //TODO Handle Commands Here
-      for(var key in dict) {
-          var regex = new RegExp(key, "gi"); //turns back to regex
-          var tested = regex.test(res.value)
-          if(tested){ //matched a regex
-            if(dict[key] == translate){// goes into translate(eng or Jap)
-              var tester = res.value.match(/([\u3040-\u30FF]+)/gi)
-              if (tester == null){
-                tester = res.value.match(/([a-z]+)/gi);
-                console.log(tester[1])
-                translate(tester[1], mycallback)
+      if(res.value == "help" || res.value == "Help"){
+        help()
+      }
+      else{
+        for(var key in dict) {
+            var regex = new RegExp(key, "gi"); //turns back to regex
+            var tested = regex.test(res.value)
+            if(tested){ //matched a regex
+              if(dict[key] == translate){// goes into translate(eng or Jap)
+                var tester = res.value.match(/([\u3040-\u30FF]+)/gi)
+                if (tester == null){
+                  tester = res.value.match(/([a-z]+)/gi);
+                  console.log(tester[1])
+                  translate(tester[1], mycallback)
+                }
+                else{
+                  console.log('jAP');
+                  translate(tester[0], mycallback)
+                }
               }
-              else{
-                console.log('jAP');
-                translate(tester[0], mycallback)
-              }
-            }
 
+            }
           }
-        }
+      }
       console.log("User Entered: ", res.value);
       return botui.action.hide({});
     }).then(function(){return main();})
