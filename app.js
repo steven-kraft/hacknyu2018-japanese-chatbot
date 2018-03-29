@@ -19,7 +19,7 @@ var delay_time = 1500;
 var correct = 0;
 var incorrect = 0;
 
-var times = [0,4,8,24,48,168,336,728,2912]; // in hours
+const times = [0,4,8,24,48,168,336,728,2912]; // in hours
 
 function hasData() {
   return localStorage.getItem('user');
@@ -33,6 +33,22 @@ function initKanaData() {
       kanaData[k] = {level: 0, next_review: null}
   })
   localStorage.setItem('kanaData', JSON.stringify(kanaData));
+}
+
+function showMessage(message, delay=1500) {
+  return botui.message.add({
+    delay: delay,
+    content: message
+  })
+}
+
+function askBool(message, yes="Yes", no="No", delay=1500) {
+  return showMessage(message, delay).then(function(){
+    return botui.action.button({
+      delay: delay,
+      action: [{text: yes, value: true}, {text: no, value: false}]
+    })
+  })
 }
 
 function kanaCorrect(cur_kana) {
@@ -71,47 +87,24 @@ function reviewResults(){
 }
 
 function showIntro(){
-  return botui.message.add({
-    content: "Hello! I'm " + botname + ". I'm glad you chose this resource to \
-      help you learn to read Japanese."
-  }).then(function () {
-      return botui.message.add({
-        content: 'Are you familiar with hiragana and katakana?',
-        delay: delay_time
-      })
-    }).then(function(){
-      return botui.action.button({
-        delay: delay_time,
-        action: [{text: 'Yes', value: true}, {text: 'No', value: false}]
-      })
-    }).then(function (res) {
+  return showMessage("Hello! I'm " + botname + ". I'm glad you chose this resource to \
+    help you learn to read Japanese.").then(function () {
+      return askBool('Are you familiar with hiragana and katakana?')}).then(function (res) {
         if(!res.value) {
-          return botui.message.add({
-            delay: delay_time,
-            content: "Hiragana and katakana, collectively called kana, are two\
-              of the three writing systems used in Japanese."
-          }).then(function(){
-            return botui.message.add({
-              delay: 3000,
-              content: "Hiragana and katakana are syllabaries which represent \
-                all of the possible sounds that can be expressed in the \
-                Japanese language."
-            }).then(function(){
-                return botui.message.add({
-                  delay: 3000,
-                  content: "There are 46 of each; each hiragana has a \
-                    corresponding katakana, and they sound the same. Hiragana \
-                    is used to write native Japanese words, and katakana is \
-                    used to write foreign loanwords."
-                  })
+          return showMessage("Hiragana and katakana, collectively called kana, are two\
+            of the three writing systems used in Japanese.").then(function(){
+            return showMessage("Hiragana and katakana are syllabaries which represent \
+              all of the possible sounds that can be expressed in the \
+              Japanese language.").then(function(){
+                return showMessage("There are 46 of each; each hiragana has a \
+                  corresponding katakana, and they sound the same. Hiragana \
+                  is used to write native Japanese words, and katakana is \
+                  used to write foreign loanwords.")
               })
           })
         }
       }).then(function(){
-          return botui.message.add({
-            delay: delay_time,
-            content: "Great! One more thing, what's your name?"
-          })
+          return showMessage("Great! One more thing, what's your name?")
         }).then(function() {
           return getUser();
         });
@@ -154,26 +147,14 @@ function checkReviews(){
 }
 
 function lessonIntro(){
-  return botui.message.add({
-    delay: delay_time,
-    content: "Let's learn hiragana!"
+  return showMessage("Let's learn hiragana!").then(function(){
+    return showMessage("During these lessons, you will be first shown a Hiragana \
+    character and how it is written.");
   }).then(function(){
-    return botui.message.add({
-      delay: delay_time,
-      content: "During these lessons, you will be first shown a Hiragana \
-      character and how it is written."
-    })
+      return showMessage("You can listen to how it's pronounced, too.");
   }).then(function(){
-      return botui.message.add({
-        delay: delay_time,
-        content: "You can listen to how it's pronounced, too."
-      })
-  }).then(function(){
-      return botui.message.add({
-        delay: delay_time,
-        content: "After you've learned a few kana, you'll be given the \
-        opportunity to review everything."
-      })
+      return showMessage("After you've learned a few kana, you'll be given the \
+      opportunity to review everything.");
   }).then(function(){return startLessons()})
 }
 
@@ -182,19 +163,8 @@ var tempLessons;
 function startLessons(){
   lessons = kanaGroups[group].slice();
   tempLessons = lessons.slice();
-  return botui.message.add({
-    delay: delay_time,
-    content: "Now, we'll begin by learning " + lessons.join(", ")
-  }).then(function(){
-    return botui.message.add({
-      delay: delay_time,
-      content: "Are you ready?"
-    });
-  }).then(function(){
-    return botui.action.button({
-      delay: delay_time,
-      action: [{text: 'Yes', value: true}, {text: 'No', value: false}]
-    })
+  return showMessage("Now, we'll begin by learning " + lessons.join(", ")).then(function(){
+    return askBool("Are you ready?");
   }).then(function(res){
     localStorage.setItem('newUser', false);
     if(!res.value) {skip = true; return main();}
@@ -210,10 +180,7 @@ function displayLessons(){
     cssClass: 'kana',
     content: lessons[0]
   }).then(function(){
-    return botui.message.add({
-      delay: 1500,
-      content: "This hiragana is " + lessons[0] + ", which can be written '" + wanakana.toRomaji(lessons[0]) + "'."
-    });
+    return showMessage("This hiragana is " + lessons[0] + ", which can be written '" + wanakana.toRomaji(lessons[0]) + "'.");
   }).then(function(){
     var button_text = "Next"
     if (lessons.length == 1) {button_text = "Done"}
@@ -239,19 +206,8 @@ function displayLessons(){
 function startReviews(){
   correct = 0;
   incorrect = 0;
-  return botui.message.add({
-    delay: delay_time,
-    content: "Let's review what you've learned!"
-  }).then(function(){
-    return botui.message.add({
-      delay: delay_time,
-      content: "You have " + checkReviews() + " reviews! Are you ready?"
-    });
-  }).then(function(){
-    return botui.action.button({
-      delay: delay_time,
-      action: [{text: 'Yes', value: true}, {text: 'No', value: false}]
-    })
+  return showMessage("Let's review what you've learned!").then(function(){
+    return askBool("You have " + checkReviews() + " reviews! Are you ready?");
   }).then(function(res){
     if(!res.value){skip = true; return main();}
     return displayReviews();
@@ -294,10 +250,7 @@ function init(){
   }
 }
 function help(){
-  botui.message.add({
-  delay: 1000,
-  content: "Enter: \'translate word\' to begin! \(The word can be English or Japanese\)"
-  });
+  showMessage("Enter: \'translate word\' to begin! \(The word can be English or Japanese\)");
 }
 
 function main(){
@@ -309,8 +262,7 @@ function main(){
     delay: delay_time,
     action: {placeholder: "Enter a Command... (Type Help if You're Stuck)"}
     }).then(function (res) {
-      //TODO Handle Commands Here
-      if(res.value == "help" || res.value == "Help"){
+      if(res.value.toLowerCase() == "help"){
         help()
       }
       else{
@@ -322,19 +274,14 @@ function main(){
                 var tester = res.value.match(/([\u3040-\u30FF]+)/gi)
                 if (tester == null){
                   tester = res.value.match(/([a-z]+)/gi);
-                  console.log(tester[1])
                   translate(tester[1], mycallback)
                 }
-                else{
-                  console.log('jAP');
-                  translate(tester[0], mycallback)
-                }
+                else{translate(tester[0], mycallback)}
               }
 
             }
           }
       }
-      console.log("User Entered: ", res.value);
       return botui.action.hide({});
     }).then(function(){return main();})
 }
@@ -342,10 +289,7 @@ function main(){
 
 var user = "";
 init().then(function(){
-  return botui.message.add({
-    content: 'Hello ' + user + '!',
-    delay: delay_time
-  });
+  showMessage('Hello ' + user + '!');
 }).then(function(){
   if(checkLessons()){
     if(parseInt(localStorage.getItem('group')) == 0){return lessonIntro();}
