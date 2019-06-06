@@ -25,7 +25,7 @@ BotUI and NodeJS.
 
 Steve Kraft https://github.com/steven-kraft
 
-Noah Eng https://github.com/jdmnoah
+Noah Eng https://github.com/noaheng
 
 Sean Hill https://github.com/seanwhill
 
